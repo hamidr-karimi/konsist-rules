@@ -2,8 +2,47 @@
 
 All notable changes to the Konsist architecture-rule library.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [1.3] — 2026-07-26
+
+### Documentation
+
+- CHANGELOG.md updated with entries for tags 1.1 and 1.2.
+- Version bumped in README.md dependency example and build.gradle.kts.
+
+## [1.2] — 2026-07-26
+
+### Changed
+
+- **Deterministic assertion ordering.** All assertions across `GeneralConventionRulesTest`,
+  `LayerDependencyRulesTest`, `NamingConventionRulesTest`, `NonBlockingRulesTest`, and
+  `TestConventionRulesTest` now call `.sortedBy { it.location }` before `.assertFalse` / `.assertTrue`,
+  so violations are reported in a consistent, sorted-by-location order instead of a non-deterministic scan
+  order.
+
+## [1.1] — 2026-07-19
+
+### Changed
+
+- **Jitpack badge and link** in README.md updated to point to the `hamidreza-ka/konsist` repository.
+
+### Fixed
+
+- **`@Autowired` detection** in `LayerDependencyRulesTest`. The redundant-`@Autowired` check now uses
+  `hasAnnotationOf(Autowired::class)` instead of a raw annotation-name string comparison, making it
+  resilient to annotation imports.
+
+### Removed
+
+- **License section** removed from README.md.
+
+### Documentation
+
+- **Rule-tag table** in README.md updated to reflect the 0.1.5 changes (added `konsist-domain-modeling`,
+  removed `konsist-package-structure`, updated descriptions).
+- **Dependency table** in README.md updated to show junit-baseline-extension 1.7 with `api` scope.
+- **Stale KDoc reference** (`@see core-kotlin.md §3.3`) removed from `LayerDependencyRulesTest`.
 
 ## [0.1.5] — 2026-07-19
 

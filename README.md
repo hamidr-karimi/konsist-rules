@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation("ir.tapsell:konsist:0.1.5")
+    testImplementation("ir.tapsell:konsist:1.3")
 }
 ```
 
