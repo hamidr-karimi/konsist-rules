@@ -27,6 +27,7 @@ class GeneralConventionRulesTest {
     fun `functions must not call println or print`() {
         Konsist.scopeFromProduction()
             .functions()
+            .sortedBy { it.location }
             .assertFalse { function ->
                 function.text.contains("println(") || function.text.contains("print(")
             }
@@ -44,6 +45,7 @@ class GeneralConventionRulesTest {
     fun `functions must not use the not-null assertion operator`() {
         Konsist.scopeFromProduction()
             .functions()
+            .sortedBy { it.location }
             .assertFalse { function ->
                 function.text.contains("!!")
             }

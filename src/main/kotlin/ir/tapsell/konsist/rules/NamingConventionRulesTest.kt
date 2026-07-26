@@ -33,6 +33,7 @@ class NamingConventionRulesTest {
         Konsist.scopeFromProduction()
             .classes()
             .withAnnotationOf(Service::class)
+            .sortedBy { it.location }
             .assertTrue {
                 it.name.endsWith("ServiceImpl")
                     || it.name.endsWith("Service")
@@ -47,6 +48,7 @@ class NamingConventionRulesTest {
         Konsist.scopeFromProduction()
             .classes()
             .withAnnotationOf(RestController::class)
+            .sortedBy { it.location }
             .assertTrue { it.name.endsWith("Controller") }
     }
 
@@ -58,6 +60,7 @@ class NamingConventionRulesTest {
         Konsist.scopeFromProduction()
             .classes()
             .withAnnotationOf(Repository::class)
+            .sortedBy { it.location }
             .assertTrue { it.name.endsWith("Repository") }
     }
 }

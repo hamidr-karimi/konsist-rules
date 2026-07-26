@@ -38,6 +38,7 @@ class TestConventionRulesTest {
 
         Konsist.scopeFromDirectory("src/test")
             .classes()
+            .sortedBy { it.location }
             .assertFalse { cls ->
                 cls.annotations.any { it.name in springContextAnnotations }
             }
@@ -57,6 +58,7 @@ class TestConventionRulesTest {
         Konsist.scopeFromTest()
             .classes()
             .withNameEndingWith("Test")
+            .sortedBy { it.location }
             .assertTrue { testClass ->
                 val mainClassName = testClass.name.removeSuffix("Test")
                 val mainClass = mainClasses.firstOrNull { it.name == mainClassName }
