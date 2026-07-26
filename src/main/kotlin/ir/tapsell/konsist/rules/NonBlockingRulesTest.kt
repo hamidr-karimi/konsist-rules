@@ -54,6 +54,7 @@ class NonBlockingRulesTest {
     fun `functions must not call blocking or unstructured-concurrency APIs`() {
         Konsist.scopeFromProduction()
             .functions()
+            .sortedBy { it.location }
             .assertFalse { function ->
                 forbiddenCalls.any { call -> function.text.contains(call) }
             }

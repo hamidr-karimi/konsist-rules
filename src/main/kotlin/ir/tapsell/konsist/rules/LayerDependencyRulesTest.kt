@@ -47,6 +47,7 @@ class LayerDependencyRulesTest {
         Konsist.scopeFromProduction()
             .classes()
             .withAnnotationOf(RestController::class)
+            .sortedBy { it.location }
             .assertFalse { controller ->
                 // Constructor injection
                 val constructorDependsOnRepo = controller.primaryConstructor?.parameters?.any { dep ->
@@ -115,6 +116,7 @@ class LayerDependencyRulesTest {
     fun `single primary constructor must not be annotated with Autowired`() {
         Konsist.scopeFromProduction()
             .classes()
+            .sortedBy { it.location }
             .assertFalse { cls ->
                 val primary = cls.primaryConstructor ?: return@assertFalse false
                 cls.secondaryConstructors.isEmpty() &&
