@@ -25,7 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- **Jitpack badge and link** in README.md updated to point to the `hamidreza-ka/konsist` repository.
+- **Jitpack badge and link** in README.md updated to point to the `hamidreza-ka/konsist-rules` repository.
 
 ### Fixed
 

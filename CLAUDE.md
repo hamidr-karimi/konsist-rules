@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A **shared Konsist architecture-rule library** published as a JAR (`ir.tapsell:konsist:0.1.2`). Consuming Kotlin/Spring projects add it as a test dependency and the rules run as part of their JUnit 5 suite. The library itself is a single-module Gradle project (`java-library` plugin), not a Gradle plugin or annotation processor.
+A **shared Konsist architecture-rule library** published as a JAR (`com.github.hamidr-karimi:konsist-rules:1.3`). Consuming Kotlin/Spring projects add it as a test dependency and the rules run as part of their JUnit 5 suite. The library itself is a single-module Gradle project (`java-library` plugin), not a Gradle plugin or annotation processor.
 
 ## Rule-Writing Conventions
 

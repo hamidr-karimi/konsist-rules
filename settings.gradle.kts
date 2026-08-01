@@ -1,1 +1,1 @@
-rootProject.name = "konsist"
+rootProject.name = "konsist-rules"
