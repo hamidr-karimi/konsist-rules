@@ -126,27 +126,26 @@ class KonsistTestEngine : TestEngine {
         listener.executionStarted(classDescriptor)
 
         // -- instantiate the test class --
-        val instance = try {
+        val instance = runCatchingReporting(classDescriptor, listener) {
             classDescriptor.testClass.getDeclaredConstructor().newInstance()
-        } catch (e: Exception) {
-            listener.executionFinished(classDescriptor, TestExecutionResult.failed(e))
-            return
-        }
+        } ?: return
 
         // -- instantiate extensions declared via @ExtendWith on the class --
         val extensions = classDescriptor.testClass
             .getAnnotationsByType(ExtendWith::class.java)
             .flatMap { it.value.toList() }
             .mapNotNull { extClass ->
-                try {
-                    extClass.java.getDeclaredConstructor().newInstance()
-                } catch (e: Exception) {
-                    listener.executionFinished(classDescriptor, TestExecutionResult.failed(
+                runCatchingReporting(
+                    classDescriptor,
+                    listener,
+                    mapError = { e ->
                         RuntimeException("Failed to instantiate extension ${extClass.java.name}: ${e.message}", e)
-                    ))
-                    return
-                }
+                    },
+                ) {
+                    extClass.java.getDeclaredConstructor().newInstance()
+                } ?: return
             }
+        val registry = ExtensionRegistry(extensions)
 
         val classContext = KonsistExtensionContext(
             configurationParameters = configParams,
@@ -156,23 +155,23 @@ class KonsistTestEngine : TestEngine {
         )
 
         // -- beforeAll callbacks --
-        try {
-            extensions.filterIsInstance<BeforeAllCallback>().forEach { it.beforeAll(classContext) }
-        } catch (e: Exception) {
-            listener.executionFinished(classDescriptor, TestExecutionResult.failed(e))
+        if (!runLifecycleStage(classDescriptor, listener) {
+                registry.beforeAll.forEach { it.beforeAll(classContext) }
+            }
+        ) {
             return
         }
 
         // -- run each method with beforeEach / afterEach / exception-handling --
         classDescriptor.children
             .filterIsInstance<KonsistMethodDescriptor>()
-            .forEach { executeMethod(it, instance, listener, extensions, classContext, configParams) }
+            .forEach { executeMethod(it, instance, listener, registry, classContext, configParams) }
 
         // -- afterAll callbacks (best-effort; failure overrides the class result) --
-        try {
-            extensions.filterIsInstance<AfterAllCallback>().forEach { it.afterAll(classContext) }
-        } catch (e: Exception) {
-            listener.executionFinished(classDescriptor, TestExecutionResult.failed(e))
+        if (!runLifecycleStage(classDescriptor, listener) {
+                registry.afterAll.forEach { it.afterAll(classContext) }
+            }
+        ) {
             return
         }
 
@@ -187,7 +186,7 @@ class KonsistTestEngine : TestEngine {
         methodDescriptor: KonsistMethodDescriptor,
         instance: Any,
         listener: EngineExecutionListener,
-        extensions: List<Any>,
+        registry: ExtensionRegistry,
         parentContext: KonsistExtensionContext,
         configParams: ConfigurationParameters,
     ) {
@@ -200,16 +199,15 @@ class KonsistTestEngine : TestEngine {
             uniqueId = methodDescriptor.uniqueId.toString(),
         )
 
+        listener.executionStarted(methodDescriptor)
+
         // -- beforeEach callbacks --
-        try {
-            extensions.filterIsInstance<BeforeEachCallback>().forEach { it.beforeEach(methodContext) }
-        } catch (e: Exception) {
-            listener.executionStarted(methodDescriptor)
-            listener.executionFinished(methodDescriptor, TestExecutionResult.failed(e))
+        if (!runLifecycleStage(methodDescriptor, listener) {
+                registry.beforeEach.forEach { it.beforeEach(methodContext) }
+            }
+        ) {
             return
         }
-
-        listener.executionStarted(methodDescriptor)
 
         // -- invoke the test method --
         var throwable: Throwable? = null
@@ -222,40 +220,86 @@ class KonsistTestEngine : TestEngine {
         }
 
         // -- exception handling chain --
-        var result: TestExecutionResult
-        if (throwable != null) {
-            val exceptionHandlers = extensions.filterIsInstance<TestExecutionExceptionHandler>()
-            var handled = false
-            var currentThrowable = throwable
-
-            for (handler in exceptionHandlers) {
-                try {
-                    handler.handleTestExecutionException(methodContext, currentThrowable!!)
-                    // If we get here, the handler swallowed the exception
-                    handled = true
-                    break
-                } catch (e: Throwable) {
-                    currentThrowable = e
-                }
-            }
-
-            result = if (handled) {
-                TestExecutionResult.successful()
-            } else {
-                TestExecutionResult.failed(currentThrowable)
-            }
+        var result = if (throwable != null) {
+            resolveExceptionResult(registry.exceptionHandlers, methodContext, throwable)
         } else {
-            result = TestExecutionResult.successful()
+            TestExecutionResult.successful()
         }
 
         // -- afterEach callbacks (best-effort; failure overrides success) --
         try {
-            extensions.filterIsInstance<AfterEachCallback>().forEach { it.afterEach(methodContext) }
+            registry.afterEach.forEach { it.afterEach(methodContext) }
         } catch (e: Exception) {
             result = TestExecutionResult.failed(e)
         }
 
         listener.executionFinished(methodDescriptor, result)
+    }
+
+    /**
+     * Runs [block] and returns its result, or reports [descriptor] as failed to [listener]
+     * and returns `null` if [block] throws. [mapError] lets callers wrap the caught exception
+     * with extra context before it is reported.
+     */
+    private inline fun <T> runCatchingReporting(
+        descriptor: TestDescriptor,
+        listener: EngineExecutionListener,
+        mapError: (Exception) -> Throwable = { it },
+        block: () -> T,
+    ): T? =
+        try {
+            block()
+        } catch (e: Exception) {
+            listener.executionFinished(descriptor, TestExecutionResult.failed(mapError(e)))
+            null
+        }
+
+    /**
+     * Runs [block] and returns `true`, or reports [descriptor] as failed to [listener]
+     * and returns `false` if [block] throws.
+     */
+    private inline fun runLifecycleStage(
+        descriptor: TestDescriptor,
+        listener: EngineExecutionListener,
+        block: () -> Unit,
+    ): Boolean =
+        try {
+            block()
+            true
+        } catch (e: Exception) {
+            listener.executionFinished(descriptor, TestExecutionResult.failed(e))
+            false
+        }
+
+    /**
+     * Walks [exceptionHandlers] in order, feeding each one [throwable] (or whatever the
+     * previous handler threw). The first handler that returns without throwing is
+     * considered to have handled the exception.
+     */
+    private fun resolveExceptionResult(
+        exceptionHandlers: List<TestExecutionExceptionHandler>,
+        context: KonsistExtensionContext,
+        throwable: Throwable,
+    ): TestExecutionResult {
+        var currentThrowable = throwable
+        for (handler in exceptionHandlers) {
+            try {
+                handler.handleTestExecutionException(context, currentThrowable)
+                return TestExecutionResult.successful()
+            } catch (e: Throwable) {
+                currentThrowable = e
+            }
+        }
+        return TestExecutionResult.failed(currentThrowable)
+    }
+
+    /** Extensions declared via [@ExtendWith][ExtendWith], pre-partitioned by callback interface. */
+    private class ExtensionRegistry(extensions: List<Any>) {
+        val beforeAll = extensions.filterIsInstance<BeforeAllCallback>()
+        val beforeEach = extensions.filterIsInstance<BeforeEachCallback>()
+        val exceptionHandlers = extensions.filterIsInstance<TestExecutionExceptionHandler>()
+        val afterEach = extensions.filterIsInstance<AfterEachCallback>()
+        val afterAll = extensions.filterIsInstance<AfterAllCallback>()
     }
 
     private companion object {
