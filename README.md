@@ -86,3 +86,20 @@ Spring Boot fat JARs use a custom `jar:nested:...` URL protocol that `java.net.J
 | ClassGraph               | 4.8.184      | `implementation` (internal only)      |
 | Spring Framework         | 6.2.7 (BOM)  | `compileOnly` (consumer supplies own) |
 
+## Publishing (manual release)
+
+The TapsellArtifactory repository (configured in `build.gradle.kts`) uploads to
+https://reg.production.tpsl.ir/artifactory/maven-tapsell-local.
+
+1. Bump `version` in `build.gradle.kts`.
+2. Update `CHANGELOG.md`.
+3. Put credentials in `.credentials/tapsell-artifactory-keys.properties`
+   (`tapsellArtifactoryUsername` / `tapsellArtifactoryPassword`) — the build
+   loads them from the repo's `.credentials` folder, or pass
+   `-PtapsellArtifactoryUsername=... -PtapsellArtifactoryPassword=...` on the
+   command line (which takes precedence).
+4. `./gradlew publishAllPublicationsToTapsellArtifactoryRepository`
+   (run from this repo's root — the root project *is* the library).
+5. Commit `release konsist X.Y`, tag `konsist-X.Y` (distinct prefix — bare
+   version tags like `1.3` are the JitPack releases).
+
