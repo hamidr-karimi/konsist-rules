@@ -43,7 +43,7 @@ Run specific rule categories with JUnit Platform tags:
 
 | Tag                        | Class                        | What it enforces                                                                                                                                                                                                                                                    |
 |----------------------------|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `konsist-domain-modeling`  | `DomainModelingRulesTest`    | Shared `Id` value types must follow canonical shape (`@JvmInline`, `value class` wrapping `UUID`, private constructor, factory methods, KDoc); functions must not use `Pair` or `Triple` in parameters or return types                                              |
+| `konsist-domain-modeling`  | `DomainModelingRulesTest`    | Functions must not use `Pair` or `Triple` in parameters or return types                                                                                                                                                                                       |
 | `konsist-general`          | `GeneralConventionRulesTest` | No `println`/`print` in production code; no `!!` not-null assertion operator                                                                                                                                                                                        |
 | `konsist-immutability`     | `ImmutabilityRulesTest`      | All class/object/companion/top-level properties must be immutable `val` (no `var`, no `lateinit`, no mutable collection types on non-private properties); public functions must not expose mutable collection return types                                          |
 | `konsist-layer-dependency` | `LayerDependencyRulesTest`   | Controllers must not depend on repositories (constructor or field injection, detected by name or `@Repository` annotation); domain layer must not depend on other layers; no `@Autowired` field injection; no redundant `@Autowired` on single primary constructors |
@@ -85,4 +85,21 @@ Spring Boot fat JARs use a custom `jar:nested:...` URL protocol that `java.net.J
 | junit-baseline-extension | 1.7          | `api` (transitive to consumers)       |
 | ClassGraph               | 4.8.184      | `implementation` (internal only)      |
 | Spring Framework         | 6.2.7 (BOM)  | `compileOnly` (consumer supplies own) |
+
+## Publishing (manual release)
+
+The TapsellArtifactory repository (configured in `build.gradle.kts`) uploads to
+https://reg.production.tpsl.ir/artifactory/maven-tapsell-local.
+
+1. Bump `version` in `build.gradle.kts`.
+2. Update `CHANGELOG.md`.
+3. Put credentials in `.credentials/tapsell-artifactory-keys.properties`
+   (`tapsellArtifactoryUsername` / `tapsellArtifactoryPassword`) — the build
+   loads them from the repo's `.credentials` folder, or pass
+   `-PtapsellArtifactoryUsername=... -PtapsellArtifactoryPassword=...` on the
+   command line (which takes precedence).
+4. `./gradlew publishAllPublicationsToTapsellArtifactoryRepository`
+   (run from this repo's root — the root project *is* the library).
+5. Commit `release konsist X.Y`, tag `konsist-X.Y` (distinct prefix — bare
+   version tags like `1.3` are the JitPack releases).
 
