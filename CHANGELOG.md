@@ -4,7 +4,12 @@ All notable changes to the Konsist architecture-rule library.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [1.4]
+## [1.4] — 2026-09-23
+
+### Changed
+
+- **Dependency coordinates** renamed to `ir.tapsell:konsist-rules`. The library is consumed from
+  TapsellArtifactory; the JitPack coordinates `com.github.hamidr-karimi:konsist-rules` are dropped from the docs.
 
 ### Removed
 

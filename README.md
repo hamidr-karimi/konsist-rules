@@ -1,22 +1,20 @@
 # Konsist Architecture Rules
 
-[![](https://jitpack.io/v/hamidr-karimi/konsist-rules.svg)](https://jitpack.io/#hamidr-karimi/konsist-rules)
-
-A shared **Konsist architecture-rule library** published as a JAR (`com.github.hamidr-karimi:konsist-rules`). Consuming Kotlin/Spring projects add it as a test dependency and the rules run as part of their JUnit 5 test suite — no Gradle plugin or annotation processor required.
+A shared **Konsist architecture-rule library** published as a JAR (`ir.tapsell:konsist-rules`). Consuming Kotlin/Spring projects add it as a test dependency and the rules run as part of their JUnit 5 test suite — no Gradle plugin or annotation processor required.
 
 ## Quick Start
 
 ### 1. Add the dependency
 
-**build.gradle.kts (Gradle — JitPack)**
+**build.gradle.kts (Gradle — TapsellArtifactory)**
 
 ```kotlin
 repositories {
-    maven { url = uri("https://jitpack.io") }
+    maven { url = uri("https://reg.production.tpsl.ir/artifactory/maven-tapsell-local") }
 }
 
 dependencies {
-    testImplementation("com.github.hamidr-karimi:konsist-rules:1.3")
+    testImplementation("ir.tapsell:konsist-rules:1.4")
 }
 ```
 
