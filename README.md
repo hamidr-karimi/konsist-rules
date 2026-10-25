@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation("ir.tapsell:konsist-rules:1.4")
+    testImplementation("ir.tapsell:konsist-rules:1.5")
 }
 ```
 
@@ -33,7 +33,7 @@ The custom `KonsistTestEngine` is discovered automatically via Java's `ServiceLo
 Run specific rule categories with JUnit Platform tags:
 
 ```bash
-./gradlew test --tests "*" -DincludeTags="konsist-naming"
+./gradlew test --tests "*" -DincludeTags="konsist-general"
 ./gradlew test --tests "*" -DincludeTags="konsist-layer-dependency"
 ```
 
@@ -41,11 +41,10 @@ Run specific rule categories with JUnit Platform tags:
 
 | Tag                        | Class                        | What it enforces                                                                                                                                                                                                                                                    |
 |----------------------------|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `konsist-domain-modeling`  | `DomainModelingRulesTest`    | Functions must not use `Pair` or `Triple` in parameters or return types                                                                                                                                                                                       |
+| `konsist-domain-modeling`  | `DomainModelingRulesTest`    | Functions must not use `Pair` or `Triple` in parameters or return types                                                                                                                                                                                             |
 | `konsist-general`          | `GeneralConventionRulesTest` | No `println`/`print` in production code; no `!!` not-null assertion operator                                                                                                                                                                                        |
 | `konsist-immutability`     | `ImmutabilityRulesTest`      | All class/object/companion/top-level properties must be immutable `val` (no `var`, no `lateinit`, no mutable collection types on non-private properties); public functions must not expose mutable collection return types                                          |
 | `konsist-layer-dependency` | `LayerDependencyRulesTest`   | Controllers must not depend on repositories (constructor or field injection, detected by name or `@Repository` annotation); domain layer must not depend on other layers; no `@Autowired` field injection; no redundant `@Autowired` on single primary constructors |
-| `konsist-naming`           | `NamingConventionRulesTest`  | `@Service` classes must end with `Service` or `ServiceImpl`; `@RestController` classes must end with `Controller`; `@Repository` classes must end with `Repository`                                                                                                 |
 | `konsist-non-blocking`     | `NonBlockingRulesTest`       | Functions must not use `Thread.sleep`, `Thread::sleep`, `CountDownLatch`, `runBlocking`, or `GlobalScope`                                                                                                                                                           |
 | `konsist-test-conventions` | `TestConventionRulesTest`    | Unit tests must not load a Spring context (no `@SpringBootTest`, `@WebMvcTest`, `@DataMongoTest`, `@AutoConfigureMockMvc`); test class package must match the class-under-test package                                                                              |
 
