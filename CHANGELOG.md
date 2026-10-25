@@ -4,6 +4,14 @@ All notable changes to the Konsist architecture-rule library.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.5] — 2026-10-25
+
+### Removed
+
+- **`NamingConventionRulesTest`** (`konsist-naming` tag). The stereotype naming conventions
+  (`@Service` → `*Service`/`*ServiceImpl`, `@RestController` → `*Controller`,
+  `@Repository` → `*Repository`) are no longer enforced.
+
 ## [1.4] — 2026-09-23
 
 ### Changed

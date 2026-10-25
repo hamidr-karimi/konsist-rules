@@ -17,7 +17,7 @@ repositories {
 dependencies {
 
     /**
-     * Spring annotations are only needed to compile NamingConventionRules;
+     * Spring annotations are only needed to compile LayerDependencyRules;
      * consuming projects supply their own Spring at runtime
      */
     compileOnly(platform("org.springframework:spring-framework-bom:6.2.7"))
