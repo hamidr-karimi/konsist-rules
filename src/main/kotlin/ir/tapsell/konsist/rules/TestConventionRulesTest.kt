@@ -47,22 +47,27 @@ class TestConventionRulesTest {
     /**
      * `FooTest` must live in the same package as `Foo`.
      *
+     * When several production classes share the simple name (e.g. a legacy and
+     * a rewritten `CampaignController`), the test passes if its package matches
+     * any of them. Picking a single candidate would make the outcome depend on
+     * the filesystem scan order, which differs between machines and CI.
+     *
      * If there is no matching production class (e.g. a helper or base test
      * class), the check is skipped — only tests with a corresponding
      * production class are constrained.
      */
     @Test
     fun `unit test package must match the package of the class under test`() {
-        val mainClasses = Konsist.scopeFromProduction().classes()
+        val mainClassesByName = Konsist.scopeFromProduction().classes().groupBy { it.name }
 
         Konsist.scopeFromTest()
             .classes()
             .withNameEndingWith("Test")
             .sortedBy { it.location }
             .assertTrue { testClass ->
-                val mainClassName = testClass.name.removeSuffix("Test")
-                val mainClass = mainClasses.firstOrNull { it.name == mainClassName }
-                mainClass == null || testClass.packagee?.name == mainClass.packagee?.name
+                val mainClasses = mainClassesByName[testClass.name.removeSuffix("Test")].orEmpty()
+                mainClasses.isEmpty() ||
+                    mainClasses.any { it.packagee?.name == testClass.packagee?.name }
             }
     }
 }

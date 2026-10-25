@@ -12,6 +12,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (`@Service` → `*Service`/`*ServiceImpl`, `@RestController` → `*Controller`,
   `@Repository` → `*Repository`) are no longer enforced.
 
+### Fixed
+
+- **Non-deterministic `unit test package must match the package of the class under test`**
+  (`konsist-test-conventions`). The rule matched a single production class by simple name via
+  `firstOrNull`, so when several classes shared a name the outcome depended on the filesystem scan
+  order — passing locally but producing a different violation set (and a baseline mismatch) on CI.
+  The rule now passes when the test's package matches **any** production class with the same name.
+
 ## [1.4] — 2026-09-23
 
 ### Changed
