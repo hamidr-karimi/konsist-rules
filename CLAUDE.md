@@ -15,7 +15,7 @@ Manual release to TapsellArtifactory is documented in README.md ("Publishing (ma
 
 ## Project Overview
 
-A **shared Konsist architecture-rule library** published as a JAR (`ir.tapsell:konsist-rules:1.4`). Consuming Kotlin/Spring projects add it as a test dependency and the rules run as part of their JUnit 5 suite. The library itself is a single-module Gradle project (`java-library` plugin), not a Gradle plugin or annotation processor.
+A **shared Konsist architecture-rule library** published as a JAR (`ir.tapsell:konsist-rules:1.5`). Consuming Kotlin/Spring projects add it as a test dependency and the rules run as part of their JUnit 5 suite. The library itself is a single-module Gradle project (`java-library` plugin), not a Gradle plugin or annotation processor.
 
 ## Rule-Writing Conventions
 
@@ -35,7 +35,7 @@ class AreaRules {
 }
 ```
 
-- **`@Tag("konsist-<area>")`** on each class — consumers filter with JUnit Platform tags (e.g., `--include-tag konsist-naming`).
+- **`@Tag("konsist-<area>")`** on each class — consumers filter with JUnit Platform tags (e.g., `--include-tag konsist-general`).
 - **`Konsist.scopeFromProduction()`** — scans `src/main` of the *consuming* project at runtime, not this library's own sources.
 - **`TestConventionRules`** is the exception: it uses `Konsist.scopeFromTest()` to scan the consumer's `src/test`.
 - **`assertFalse`** is the default style — rules describe what must *not* happen. Use `assertTrue` only for positive constraints.
