@@ -1,0 +1,40 @@
+variables:
+  GRADLE_USER_HOME: ".gradle" # use project .gradle as system .gradle to be cacheable
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 1
+
+.global_cache: &global_cache
+  key:
+    files:
+      - gradle/wrapper/gradle-wrapper.properties
+    prefix: CACHE_GLOBAL
+  paths:
+    - ".gradle/"
+
+.gradle-base:
+  image: gradle:jdk21
+  cache:
+    - <<: *global_cache
+
+stages:
+  - build
+  - publish
+
+build-gradle:
+  stage: build
+  extends: .gradle-base
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - ./gradlew build --build-cache
+  artifacts:
+    paths:
+      - build/libs/*.jar
+
+publish-gradle:
+  stage: publish
+  extends: .gradle-base
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - ./gradlew publishAllPublicationsToTapsellArtifactoryRepository --build-cache

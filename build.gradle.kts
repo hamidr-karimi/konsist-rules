@@ -1,5 +1,3 @@
-import java.util.Properties
-
 plugins {
     kotlin("jvm") version "2.0.0"
     `java-library`
@@ -44,7 +42,7 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 tasks.test {
@@ -58,19 +56,6 @@ tasks.test {
 /** Publishing — see "Publishing (manual release)" in README.md. Naming the repository
  *  `TapsellArtifactory` generates the `publishAllPublicationsToTapsellArtifactoryRepository` task. */
 
-/**
- * Credentials are loaded from .credentials/tapsell-artifactory-keys.properties
- * (tapsellArtifactoryUsername / tapsellArtifactoryPassword); -P... project
- * properties take precedence over the file.
- */
-val credentialProperties = Properties().apply {
-    val file = file(".credentials/tapsell-artifactory-keys.properties")
-    if (file.exists()) file.inputStream().use { load(it) }
-}
-
-fun tapsellCredential(name: String): String? =
-    (findProperty(name) as String?) ?: credentialProperties.getProperty(name)
-
 publishing {
     publications {
         create<MavenPublication>("library") {
@@ -82,8 +67,8 @@ publishing {
             name = "TapsellArtifactory"
             url = uri("https://reg.production.tpsl.ir/artifactory/maven-tapsell-local")
             credentials {
-                username = tapsellCredential("tapsellArtifactoryUsername")
-                password = tapsellCredential("tapsellArtifactoryPassword")
+                username = findProperty("REGISTRY_USERNAME") as String?
+                password = findProperty("REGISTRY_PASSWORD") as String?
             }
         }
     }

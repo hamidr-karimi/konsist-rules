@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Publishing
 
-Manual release to TapsellArtifactory is documented in README.md ("Publishing (manual release)"): bump `version` in `build.gradle.kts`, update `CHANGELOG.md`, credentials from `.credentials/tapsell-artifactory-keys.properties` (`tapsellArtifactoryUsername` / `tapsellArtifactoryPassword`, with `-P` flags taking precedence), then `./gradlew publishAllPublicationsToTapsellArtifactoryRepository` (repository configured in `build.gradle.kts`). Commit `release konsist X.Y`, tag `konsist-X.Y`.
+Manual release to TapsellArtifactory is documented in README.md ("Publishing (manual release)"): bump `version` in `build.gradle.kts`, update `CHANGELOG.md`, supply credentials as `tapsellArtifactoryUsername` / `tapsellArtifactoryPassword` project properties (`-P` flags, or `ORG_GRADLE_PROJECT_*` env vars — CI maps `REGISTRY_USERNAME` / `REGISTRY_PASSWORD` onto them), then `./gradlew publishAllPublicationsToTapsellArtifactoryRepository` (repository configured in `build.gradle.kts`). Commit `release konsist X.Y`, tag `konsist-X.Y`.
 
 ## Project Overview
 
