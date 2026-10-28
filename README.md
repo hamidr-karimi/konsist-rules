@@ -74,7 +74,7 @@ Spring Boot fat JARs use a custom `jar:nested:...` URL protocol that `java.net.J
 
 | Dependency               | Version      | Scope                                 |
 |--------------------------|--------------|---------------------------------------|
-| Kotlin                   | 2.0.0        | JVM toolchain 21                      |
+| Kotlin                   | 2.0.0        | JVM toolchain 17                      |
 | Gradle                   | 9.0.0        | Wrapper included                      |
 | Konsist                  | 0.17.3       | `api` (transitive to consumers)       |
 | JUnit Jupiter            | 5.10.2 (BOM) | `api` (transitive to consumers)       |

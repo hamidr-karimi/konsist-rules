@@ -42,7 +42,7 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }
 
 tasks.test {
@@ -67,8 +67,8 @@ publishing {
             name = "TapsellArtifactory"
             url = uri("https://reg.production.tpsl.ir/artifactory/maven-tapsell-local")
             credentials {
-                username = findProperty("REGISTRY_USERNAME") as String?
-                password = findProperty("REGISTRY_PASSWORD") as String?
+                username = findProperty("ARTIFACTORY_USERNAME") as String?
+                password = findProperty("ARTIFACTORY_PASSWORD") as String?
             }
         }
     }
