@@ -74,7 +74,7 @@ Spring Boot fat JARs use a custom `jar:nested:...` URL protocol that `java.net.J
 
 | Dependency               | Version      | Scope                                 |
 |--------------------------|--------------|---------------------------------------|
-| Kotlin                   | 2.0.0        | JVM toolchain 17                      |
+| Kotlin                   | 2.0.0        | JVM toolchain 21                      |
 | Gradle                   | 9.0.0        | Wrapper included                      |
 | Konsist                  | 0.17.3       | `api` (transitive to consumers)       |
 | JUnit Jupiter            | 5.10.2 (BOM) | `api` (transitive to consumers)       |
@@ -90,13 +90,16 @@ https://reg.production.tpsl.ir/artifactory/maven-tapsell-local.
 
 1. Bump `version` in `build.gradle.kts`.
 2. Update `CHANGELOG.md`.
-3. Put credentials in `.credentials/tapsell-artifactory-keys.properties`
-   (`tapsellArtifactoryUsername` / `tapsellArtifactoryPassword`) — the build
-   loads them from the repo's `.credentials` folder, or pass
+3. Provide credentials as Gradle project properties — either
    `-PtapsellArtifactoryUsername=... -PtapsellArtifactoryPassword=...` on the
-   command line (which takes precedence).
+   command line, or via the `ORG_GRADLE_PROJECT_tapsellArtifactoryUsername` /
+   `ORG_GRADLE_PROJECT_tapsellArtifactoryPassword` environment variables.
 4. `./gradlew publishAllPublicationsToTapsellArtifactoryRepository`
    (run from this repo's root — the root project *is* the library).
 5. Commit `release konsist X.Y`, tag `konsist-X.Y` (distinct prefix — bare
    version tags like `1.3` are the JitPack releases).
+
+In CI, the `publish-gradle` job publishes on tag pipelines, mapping the
+`REGISTRY_USERNAME` / `REGISTRY_PASSWORD` CI/CD variables onto the same
+project properties.
 
