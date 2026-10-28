@@ -43,6 +43,4 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-
-### Credentials ###
-/.credentials/
+/.idea/
